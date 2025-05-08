@@ -2,6 +2,7 @@ package com.example.foodapp.ViewModel
 
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.ViewModel
+import com.example.foodapp.Model.CategoryModel
 import com.example.foodapp.Model.SliderModel
 import com.example.foodapp.Repository.MainRepository
 import com.google.firebase.database.core.view.View
@@ -12,4 +13,9 @@ class MainViewModel():ViewModel() {
     fun loadBanner(): LiveData<MutableList<SliderModel>>{
         return repository.loadBanner()
     }
+
+    fun loadCategory(): LiveData<MutableList<CategoryModel>>{
+        return repository.loadCategory()
+    }
+
 }

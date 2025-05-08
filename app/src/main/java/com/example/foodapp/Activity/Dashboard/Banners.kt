@@ -69,16 +69,16 @@ fun AutoSlidingCarousel(
                     .padding(top = 16.dp, bottom = 8.dp)
                     .height(150.dp)
             )
-            DotIndicator(
-                modifier = Modifier
-                    .padding(horizontal = 8.dp)
-                    .align(Alignment.CenterHorizontally),
-                totalDots = banners.size,
-                selectedIndex = if (isDragged) pagerState.currentPage else pagerState.currentPage,
-                dotSize = 8.dp
-            )
 
         }
+        DotIndicator(
+            modifier = Modifier
+                .padding(horizontal = 8.dp)
+                .align(Alignment.CenterHorizontally),
+            totalDots = banners.size,
+            selectedIndex = if (isDragged) pagerState.currentPage else pagerState.currentPage,
+            dotSize = 8.dp
+        )
     }
 }
 
