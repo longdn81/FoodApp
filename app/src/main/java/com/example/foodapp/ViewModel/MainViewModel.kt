@@ -22,4 +22,8 @@ class MainViewModel():ViewModel() {
         return repository.loadBestSeller()
     }
 
+    fun loadFiltered(id:String): LiveData<MutableList<ItemsModel>>{
+        return repository.loadFiltered(id)
+    }
+
 }

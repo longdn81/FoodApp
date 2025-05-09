@@ -15,6 +15,8 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.lazy.LazyRow
+import androidx.compose.foundation.lazy.grid.GridCells
+import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -36,6 +38,20 @@ import coil.compose.AsyncImage
 import com.example.foodapp.Activity.Detail.DetailActivity
 import com.example.foodapp.Model.ItemsModel
 import com.example.foodapp.R
+
+@Composable
+fun ListItemsFullSizeVertical(items: List<ItemsModel>) {
+    LazyVerticalGrid(
+        columns = GridCells.Fixed(count = 2),
+        modifier = Modifier.padding(horizontal = 8.dp, vertical = 16.dp),
+        horizontalArrangement = Arrangement.spacedBy(16.dp)
+    ) {
+        items(items.size) { index: Int ->
+            BestSellerItem(items, index)
+        }
+    }
+}
+
 
 @Composable
 fun ListItems(items: List<ItemsModel>) {
