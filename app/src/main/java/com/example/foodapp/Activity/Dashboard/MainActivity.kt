@@ -31,6 +31,7 @@ import androidx.compose.ui.Alignment
 
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
@@ -39,6 +40,7 @@ import androidx.compose.ui.unit.sp
 import androidx.constraintlayout.compose.ConstraintLayout
 import com.example.foodapp.Activity.BaseActivity
 import com.example.foodapp.Model.CategoryModel
+import com.example.foodapp.Model.ItemModel
 import com.example.foodapp.Model.SliderModel
 import com.example.foodapp.R
 import com.example.foodapp.ViewModel.MainViewModel
@@ -61,9 +63,12 @@ fun DashboardScreen() {
 
     val banners = remember { mutableStateListOf<SliderModel>() }
     val categories = remember { mutableStateListOf<CategoryModel>() }
+    val bestseller = remember { mutableStateListOf<ItemModel>() }
+
 
     var showBannerLoading by remember { mutableStateOf(value = true) }
     var showCategoryLoading by remember { mutableStateOf(value = true) }
+    var showBestSellerLoading by remember { mutableStateOf(value = true) }
 
     // banner
     LaunchedEffect(Unit) {
@@ -80,6 +85,14 @@ fun DashboardScreen() {
             categories.clear()
             categories.addAll(it)
             showCategoryLoading = false
+        }
+    }
+    // best seller
+    LaunchedEffect(Unit) {
+        viewModel.loadBestSeller().observeForever {
+            bestseller.clear()
+            bestseller.addAll(it)
+            showBestSellerLoading = false
         }
     }
 
@@ -99,7 +112,7 @@ fun DashboardScreen() {
             item{
                 Row (modifier = Modifier
                     .fillMaxSize()
-                    .padding(top = 70.dp)
+                    .padding(top = 40.dp)
                     .padding(horizontal = 16.dp),
                     horizontalArrangement = Arrangement.SpaceBetween,
                     verticalAlignment =  Alignment.CenterVertically
@@ -163,6 +176,41 @@ fun DashboardScreen() {
                     }
                 } else {
                     CategoryList(categories = categories)
+                }
+            }
+            item{
+                Row (modifier = Modifier
+                    .fillMaxSize()
+                    .padding(top = 24.dp)
+                    .padding(horizontal = 16.dp),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                ){
+                    Text(
+                        text = "Best Seller Product",
+                        color = Color.Black,
+                        fontSize = 18.sp,
+                        fontWeight = FontWeight.Bold,
+
+                    )
+                    Text(
+                        text = "See All",
+                        color = colorResource(R.color.midBrown),
+
+                        )
+                }
+            }
+            item {
+                if (showBestSellerLoading) {
+                    Box(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(200.dp),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        CircularProgressIndicator()
+                    }
+                } else {
+                    ListItems(bestseller)
                 }
             }
         }
