@@ -51,14 +51,14 @@ class MainActivity : BaseActivity() {
         super.onCreate(savedInstanceState)
 
         setContent {
-            DashboardScreen()
+            DashboardScreen{}
         }
     }
 }
 
 @Composable
-@Preview
-fun DashboardScreen() {
+
+fun DashboardScreen(onCartClick:() -> Unit) {
     val viewModel = MainViewModel()
 
     val banners = remember { mutableStateListOf<SliderModel>() }
@@ -214,6 +214,14 @@ fun DashboardScreen() {
                 }
             }
         }
+        BottomMenu(
+            modifier = Modifier
+                .fillMaxWidth()
+                .constrainAs(bottomMenu) {
+                    bottom.linkTo(parent.bottom)
+                },
+            onItemClick = onCartClick
+        )
     }
 }
 
