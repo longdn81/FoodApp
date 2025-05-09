@@ -1,9 +1,7 @@
 package com.example.foodapp.Activity.Dashboard
 
 import android.os.Bundle
-import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -18,7 +16,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -34,17 +31,15 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.constraintlayout.compose.ConstraintLayout
 import com.example.foodapp.Activity.BaseActivity
 import com.example.foodapp.Model.CategoryModel
-import com.example.foodapp.Model.ItemModel
+import com.example.foodapp.Model.ItemsModel
 import com.example.foodapp.Model.SliderModel
 import com.example.foodapp.R
 import com.example.foodapp.ViewModel.MainViewModel
-import com.example.foodapp.ui.theme.FoodAppTheme
 
 class MainActivity : BaseActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -63,7 +58,7 @@ fun DashboardScreen(onCartClick:() -> Unit) {
 
     val banners = remember { mutableStateListOf<SliderModel>() }
     val categories = remember { mutableStateListOf<CategoryModel>() }
-    val bestseller = remember { mutableStateListOf<ItemModel>() }
+    val bestseller = remember { mutableStateListOf<ItemsModel>() }
 
 
     var showBannerLoading by remember { mutableStateOf(value = true) }

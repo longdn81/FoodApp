@@ -1,5 +1,6 @@
 package com.example.foodapp.Activity.Dashboard
 
+import android.content.Intent
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -30,12 +31,14 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.core.content.ContextCompat.startActivity
 import coil.compose.AsyncImage
-import com.example.foodapp.Model.ItemModel
+import com.example.foodapp.Activity.Detail.DetailActivity
+import com.example.foodapp.Model.ItemsModel
 import com.example.foodapp.R
 
 @Composable
-fun ListItems(items: List<ItemModel>) {
+fun ListItems(items: List<ItemsModel>) {
     LazyRow(
         modifier = Modifier.padding(top = 8.dp),
         horizontalArrangement = Arrangement.spacedBy(16.dp),
@@ -48,7 +51,7 @@ fun ListItems(items: List<ItemModel>) {
 }
 
 @Composable
-fun BestSellerItem(items:List<ItemModel> , pos : Int){
+fun BestSellerItem(items:List<ItemsModel>, pos : Int){
     val context = LocalContext.current
 
     Column(modifier = Modifier
@@ -64,7 +67,10 @@ fun BestSellerItem(items:List<ItemModel> , pos : Int){
                 .clip(RoundedCornerShape(10.dp))
                 .height(180.dp)
                 .clickable {
-                    // TODO: Handle click
+                    val intent = Intent(context, DetailActivity::class.java).apply {
+                        putExtra( "object", items[pos])
+                    }
+                    startActivity(context, intent, null)
                 },
             contentScale = ContentScale.Crop
         )
@@ -98,3 +104,4 @@ fun BestSellerItem(items:List<ItemModel> , pos : Int){
         }
     }
 }
+

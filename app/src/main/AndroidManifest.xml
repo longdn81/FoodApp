@@ -13,11 +13,14 @@
         android:theme="@style/Theme.FoodApp"
         tools:targetApi="31">
         <activity
+            android:name=".Activity.Detail.DetailActivity"
+            android:exported="false" />
+        <activity
             android:name=".Activity.BaseActivity"
             android:exported="false" />
         <activity
             android:name=".Activity.Splash.SplashActivity"
-            android:exported="true" >
+            android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -28,9 +31,7 @@
             android:name=".Activity.Dashboard.MainActivity"
             android:exported="true"
             android:label="@string/app_name"
-            android:theme="@style/Theme.FoodApp">
-
-        </activity>
+            android:theme="@style/Theme.FoodApp"></activity>
     </application>
 
 </manifest>

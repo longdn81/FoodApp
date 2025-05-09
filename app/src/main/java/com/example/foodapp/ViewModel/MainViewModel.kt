@@ -3,10 +3,9 @@ package com.example.foodapp.ViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.ViewModel
 import com.example.foodapp.Model.CategoryModel
-import com.example.foodapp.Model.ItemModel
+import com.example.foodapp.Model.ItemsModel
 import com.example.foodapp.Model.SliderModel
 import com.example.foodapp.Repository.MainRepository
-import com.google.firebase.database.core.view.View
 
 class MainViewModel():ViewModel() {
     private  val repository = MainRepository()
@@ -19,7 +18,7 @@ class MainViewModel():ViewModel() {
         return repository.loadCategory()
     }
 
-    fun loadBestSeller(): LiveData<MutableList<ItemModel>>{
+    fun loadBestSeller(): LiveData<MutableList<ItemsModel>>{
         return repository.loadBestSeller()
     }
 
