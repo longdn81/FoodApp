@@ -1,5 +1,6 @@
 package com.example.foodapp.Activity.Dashboard
 
+import android.content.Intent
 import android.os.Bundle
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.Image
@@ -35,6 +36,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.constraintlayout.compose.ConstraintLayout
 import com.example.foodapp.Activity.BaseActivity
+import com.example.foodapp.Activity.Cart.CartActivity
 import com.example.foodapp.Model.CategoryModel
 import com.example.foodapp.Model.ItemsModel
 import com.example.foodapp.Model.SliderModel
@@ -46,7 +48,9 @@ class MainActivity : BaseActivity() {
         super.onCreate(savedInstanceState)
 
         setContent {
-            DashboardScreen{}
+            DashboardScreen{
+                startActivity(Intent(this ,CartActivity ::class.java))
+            }
         }
     }
 }

@@ -1,5 +1,6 @@
 package com.example.foodapp.Activity.Detail
 
+import android.content.Intent
 import android.os.Bundle
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
@@ -35,6 +36,7 @@ import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import coil.compose.rememberAsyncImagePainter
 import com.example.foodapp.Activity.BaseActivity
+import com.example.foodapp.Activity.Cart.CartActivity
 import com.example.foodapp.Helper.ManagmentCart
 import com.example.foodapp.Model.ItemsModel
 import com.example.foodapp.R
@@ -57,7 +59,7 @@ class DetailActivity : BaseActivity() {
                     managmentCart.insertItems(item)
                 },
                 onCartClick = {
-
+                    startActivity(Intent(this , CartActivity ::class.java))
                 }
             )
         }

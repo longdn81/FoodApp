@@ -31,7 +31,7 @@ fun BottomMenu(modifier: Modifier, onItemClick: (() -> Unit)? = null) {
         horizontalArrangement = Arrangement.SpaceAround
     ) {
         BottomMenuItem(icon = painterResource(R.drawable.btn_1), text = "Explorer")
-        BottomMenuItem(icon = painterResource(R.drawable.btn_2), text = "Cart")
+        BottomMenuItem(icon = painterResource(R.drawable.btn_2), text = "Cart" , onItemClick = onItemClick)
         BottomMenuItem(icon = painterResource(R.drawable.btn_3), text = "Favorite")
         BottomMenuItem(icon = painterResource(R.drawable.btn_4), text = "Orders")
         BottomMenuItem(icon = painterResource(R.drawable.btn_5), text = "Profile")
