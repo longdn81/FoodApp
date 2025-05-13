@@ -53,6 +53,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.foodapp.Activity.BaseActivity
 import com.example.foodapp.Activity.Dashboard.MainActivity
+import com.example.foodapp.Model.UserModel
 import com.example.foodapp.R
 import com.example.foodapp.ViewModel.AuthState
 import com.example.foodapp.ViewModel.AuthViewModel
@@ -106,7 +107,8 @@ fun SignupScreen(modifier: Modifier = Modifier, authViewModel: AuthViewModel
     LaunchedEffect(authState.value) {
         when (authState.value) {
             is AuthState.Authenticated ->{
-                val intent = Intent(context, MainActivity::class.java)
+                Toast.makeText(context, "Signup successful", Toast.LENGTH_SHORT).show()
+                val intent = Intent(context, LoginActivity::class.java)
                 context.startActivity(intent)
 
                 // Nếu bạn muốn đóng Activity hiện tại:
@@ -264,7 +266,14 @@ fun SignupScreen(modifier: Modifier = Modifier, authViewModel: AuthViewModel
 
         Button(
             onClick = {
-                authViewModel.signup(email, password)
+                val user = UserModel(
+                    name = name,
+                    phone = phone,
+                    address = address,
+                    birthDate = birthDate,
+                    email = email
+                )
+                authViewModel.signupWithUser(user, password)
             },
             enabled = authState.value != AuthState.Loading,
             shape = RoundedCornerShape(50),
