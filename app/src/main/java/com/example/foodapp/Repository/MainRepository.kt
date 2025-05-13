@@ -80,7 +80,7 @@ class MainRepository {
         })
         return listData
     }
-     fun loadFiltered(id : String) : LiveData<MutableList<ItemsModel>>{
+    fun loadFiltered(id : String) : LiveData<MutableList<ItemsModel>>{
          val listData= MutableLiveData<MutableList<ItemsModel>>()
          val ref = firebaseDatabase.getReference("Items")
          val query: Query = ref.orderByChild("categoryId").equalTo(id)

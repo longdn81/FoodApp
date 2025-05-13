@@ -30,6 +30,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.example.foodapp.Activity.Authentication.LoginActivity
 import com.example.foodapp.Activity.BaseActivity
 import com.example.foodapp.Activity.Dashboard.MainActivity
 import com.example.foodapp.R
@@ -43,7 +44,7 @@ class SplashActivity : BaseActivity() {
 
             SplashScreen(
                 onClick = {
-                    context.startActivity(Intent(context, MainActivity::class.java))
+                    context.startActivity(Intent(context, LoginActivity::class.java))
                 }
             )
         }
@@ -82,7 +83,7 @@ fun SplashScreen(onClick: () -> Unit = {}){
             modifier = Modifier.padding(top = 16.dp)
         )
 
-        Button( onClick = { context.startActivity(Intent(context, MainActivity::class.java) )},
+        Button( onClick = { context.startActivity(Intent(context, LoginActivity::class.java) )},
             shape = RoundedCornerShape(10.dp),
             colors = ButtonDefaults.buttonColors(
                 containerColor = colorResource(R.color.green)

@@ -23,7 +23,7 @@ import androidx.compose.ui.unit.sp
 import com.example.foodapp.R
 
 @Composable
-fun BottomMenu(modifier: Modifier, onItemClick: (() -> Unit)? = null) {
+fun BottomMenu(modifier: Modifier,   onItemClick: (String) -> Unit) {
     Row(
         modifier = modifier
             .padding(start = 16.dp, end = 16.dp, bottom = 32.dp)
@@ -31,10 +31,14 @@ fun BottomMenu(modifier: Modifier, onItemClick: (() -> Unit)? = null) {
         horizontalArrangement = Arrangement.SpaceAround
     ) {
         BottomMenuItem(icon = painterResource(R.drawable.btn_1), text = "Explorer")
-        BottomMenuItem(icon = painterResource(R.drawable.btn_2), text = "Cart" , onItemClick = onItemClick)
+        BottomMenuItem(icon = painterResource(R.drawable.btn_2), text = "Cart" ){
+            onItemClick("Cart")
+        }
         BottomMenuItem(icon = painterResource(R.drawable.btn_3), text = "Favorite")
         BottomMenuItem(icon = painterResource(R.drawable.btn_4), text = "Orders")
-        BottomMenuItem(icon = painterResource(R.drawable.btn_5), text = "Profile")
+        BottomMenuItem(icon = painterResource(R.drawable.btn_5), text = "Profile") {
+            onItemClick("Profile")
+        }
     }
 }
 

@@ -37,6 +37,7 @@ import androidx.compose.ui.unit.sp
 import androidx.constraintlayout.compose.ConstraintLayout
 import com.example.foodapp.Activity.BaseActivity
 import com.example.foodapp.Activity.Cart.CartActivity
+import com.example.foodapp.Activity.Profile.ProfileActivity
 import com.example.foodapp.Model.CategoryModel
 import com.example.foodapp.Model.ItemsModel
 import com.example.foodapp.Model.SliderModel
@@ -48,8 +49,11 @@ class MainActivity : BaseActivity() {
         super.onCreate(savedInstanceState)
 
         setContent {
-            DashboardScreen{
-                startActivity(Intent(this ,CartActivity ::class.java))
+            DashboardScreen{ menu ->
+                when (menu) {
+                    "Cart" -> startActivity(Intent(this, CartActivity::class.java))
+                    "Profile" -> startActivity(Intent(this, ProfileActivity::class.java))
+                }
             }
         }
     }
@@ -57,7 +61,7 @@ class MainActivity : BaseActivity() {
 
 @Composable
 
-fun DashboardScreen(onCartClick:() -> Unit) {
+fun DashboardScreen(onNavigate: (String) -> Unit ) {
     val viewModel = MainViewModel()
 
     val banners = remember { mutableStateListOf<SliderModel>() }
@@ -219,7 +223,13 @@ fun DashboardScreen(onCartClick:() -> Unit) {
                 .constrainAs(bottomMenu) {
                     bottom.linkTo(parent.bottom)
                 },
-            onItemClick = onCartClick
+            onItemClick = { menu ->
+                when (menu) {
+                    "Cart" -> onNavigate("Cart")
+                    "Profile" -> onNavigate("Profile")
+
+                }
+            }
         )
     }
 }

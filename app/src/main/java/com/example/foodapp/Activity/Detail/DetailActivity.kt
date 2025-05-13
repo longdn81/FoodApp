@@ -59,7 +59,7 @@ class DetailActivity : BaseActivity() {
                     managmentCart.insertItems(item)
                 },
                 onCartClick = {
-                    startActivity(Intent(this , CartActivity ::class.java))
+                    startActivity(Intent(this ,CartActivity ::class.java))
                 }
             )
         }

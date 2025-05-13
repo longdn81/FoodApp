@@ -37,11 +37,13 @@ fun FooterSection(onAddToCartClick: () -> Unit, onCartClick: () -> Unit) {
         ) {
             Text(text = "Add to Cart", fontSize = 18.sp , color = Color.White)
         }
-        Icon(
-            painter = painterResource(R.drawable.btn_2),
-            contentDescription = "Cart",
-            tint = Color.Black
-        )
+        IconButton(onClick = onCartClick) {
+            Icon(
+                painter = painterResource(R.drawable.btn_2),
+                contentDescription = "Cart",
+                tint = Color.Black
+            )
+        }
 
     }
 }
