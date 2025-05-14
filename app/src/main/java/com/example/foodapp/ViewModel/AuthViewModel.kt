@@ -28,26 +28,59 @@ class AuthViewModel : ViewModel() {
 
 
     fun checkAuthStatus(){
-        if(auth.currentUser==null){
+        val uid = auth.currentUser?.uid
+        if (uid == null) {
             _authState.value = AuthState.Unauthenticated
-        }else{
-            _authState.value = AuthState.Authenticated
+            return
+        }
+
+        viewModelScope.launch {
+            _authState.value = AuthState.Loading
+            try {
+                val snapshot = firestore.collection("users").document(uid).get().await()
+                val user = snapshot.toObject(UserModel::class.java)
+                if (user != null) {
+                    _authState.value = AuthState.Authenticated(user)
+                } else {
+                    _authState.value = AuthState.Error("Không tìm thấy người dùng")
+                }
+            } catch (e: Exception) {
+                _authState.value = AuthState.Error("Lỗi khi tải người dùng: ${e.message}")
+            }
         }
     }
 
     fun login(email : String,password : String){
-
-        if(email.isEmpty() || password.isEmpty()){
+        if (email.isEmpty() || password.isEmpty()) {
             _authState.value = AuthState.Error("Email or password can't be empty")
             return
         }
+
         _authState.value = AuthState.Loading
-        auth.signInWithEmailAndPassword(email,password)
-            .addOnCompleteListener{task->
-                if (task.isSuccessful){
-                    _authState.value = AuthState.Authenticated
-                }else{
-                    _authState.value = AuthState.Error(task.exception?.message?:"Something went wrong")
+
+        auth.signInWithEmailAndPassword(email, password)
+            .addOnCompleteListener { task ->
+                if (task.isSuccessful) {
+                    val uid = auth.currentUser?.uid
+                    if (uid != null) {
+                        viewModelScope.launch {
+                            try {
+                                val snapshot = firestore.collection("users").document(uid).get().await()
+                                val user = snapshot.toObject(UserModel::class.java)
+                                if (user != null) {
+                                    _authState.value = AuthState.Authenticated(user)
+                                } else {
+                                    _authState.value = AuthState.Error("Không tìm thấy người dùng")
+                                }
+                            } catch (e: Exception) {
+                                _authState.value = AuthState.Error("Lỗi khi lấy dữ liệu: ${e.message}")
+                            }
+                        }
+                    } else {
+                        _authState.value = AuthState.Error("UID không tồn tại")
+                    }
+                } else {
+                    _authState.value = AuthState.Error(task.exception?.message ?: "Đăng nhập thất bại")
                 }
             }
     }
@@ -71,7 +104,7 @@ class AuthViewModel : ViewModel() {
                 firestore.collection("users").document(uid).set(userWithUid).await()
 
                 // Cập nhật trạng thái thành công
-                _authState.value = AuthState.Authenticated
+                _authState.value = AuthState.Authenticated(userWithUid)
             } catch (e: Exception) {
                 // Xử lý lỗi và thông báo
                 _authState.value = AuthState.Error("Đăng ký thất bại: ${e.message}")
@@ -84,10 +117,32 @@ class AuthViewModel : ViewModel() {
         _authState.value = AuthState.Unauthenticated
     }
 
+    fun loadUserProfile() {
+        val uid = auth.currentUser?.uid ?: run {
+            _authState.value = AuthState.Unauthenticated
+            return
+        }
+
+        viewModelScope.launch {
+            _authState.value = AuthState.Loading
+            try {
+                val snapshot = firestore.collection("users").document(uid).get().await()
+                val user = snapshot.toObject(UserModel::class.java)
+                if (user != null) {
+                    _authState.value = AuthState.Authenticated(user)
+                } else {
+                    _authState.value = AuthState.Error("Không tìm thấy thông tin người dùng.")
+                }
+            } catch (e: Exception) {
+                _authState.value = AuthState.Error("Lỗi tải thông tin: ${e.message}")
+            }
+        }
+    }
+
 
 }
 sealed class AuthState{
-    object Authenticated : AuthState()
+    data class Authenticated(val user: UserModel) : AuthState()
     object Unauthenticated : AuthState()
     object Loading : AuthState()
     data class Error(val message : String) : AuthState()
