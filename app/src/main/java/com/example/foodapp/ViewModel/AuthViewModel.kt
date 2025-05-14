@@ -1,13 +1,17 @@
 package com.example.foodapp.ViewModel
 
+import android.net.Uri
+import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.foodapp.Model.UserModel
 import com.example.foodapp.Repository.AuthRepository
+import com.google.firebase.ktx.Firebase
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.storage.ktx.storage
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.tasks.await
 
@@ -15,6 +19,7 @@ class AuthViewModel : ViewModel() {
 
     private val firestore: FirebaseFirestore = FirebaseFirestore.getInstance()
     private val auth : FirebaseAuth = FirebaseAuth.getInstance()
+    private val storageRef = Firebase.storage.reference
 
     private val _authState = MutableLiveData<AuthState>()
     val authState: LiveData<AuthState> = _authState
@@ -118,23 +123,58 @@ class AuthViewModel : ViewModel() {
     }
 
     fun loadUserProfile() {
-        val uid = auth.currentUser?.uid ?: run {
+        val currentUser = auth.currentUser
+        if (currentUser == null) {
             _authState.value = AuthState.Unauthenticated
             return
         }
 
         viewModelScope.launch {
-            _authState.value = AuthState.Loading
             try {
-                val snapshot = firestore.collection("users").document(uid).get().await()
+                val snapshot = firestore.collection("users")
+                    .document(currentUser.uid)
+                    .get()
+                    .await()
+
                 val user = snapshot.toObject(UserModel::class.java)
                 if (user != null) {
                     _authState.value = AuthState.Authenticated(user)
                 } else {
-                    _authState.value = AuthState.Error("Không tìm thấy thông tin người dùng.")
+                    _authState.value = AuthState.Unauthenticated
                 }
             } catch (e: Exception) {
-                _authState.value = AuthState.Error("Lỗi tải thông tin: ${e.message}")
+                _authState.value = AuthState.Error("Không thể tải thông tin người dùng: ${e.message}")
+            }
+        }
+    }
+
+    fun updateUserProfile(updated: UserModel, newAvatarUri: Uri? = null) {
+        viewModelScope.launch {
+            _authState.value = AuthState.Loading
+
+            try {
+                val finalUser = if (newAvatarUri != null) {
+                    // Upload ảnh trước
+                    val ref = storageRef.child("avatars/${updated.uid}.jpg")
+                    ref.putFile(newAvatarUri).await()
+                    val url = ref.downloadUrl.await().toString()
+
+                    updated.copy(avatarUrl = url)
+                } else {
+                    updated
+                }
+
+                // Cập nhật Firestore
+                firestore.collection("users")
+                    .document(finalUser.uid)
+                    .set(finalUser)
+                    .await()
+
+                _authState.value = AuthState.Authenticated(finalUser)
+
+            } catch (e: Exception) {
+                Log.e("SAVE_PROFILE", "Lỗi cập nhật: ${e.message}")
+                _authState.value = AuthState.Error("Lỗi cập nhật: ${e.message}")
             }
         }
     }

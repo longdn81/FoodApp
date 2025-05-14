@@ -2,26 +2,35 @@ package com.example.foodapp.Activity.Profile
 
 import android.app.Activity
 import android.content.Intent
+import android.net.Uri
 import android.os.Bundle
+import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AccountCircle
 import androidx.compose.material.icons.filled.DateRange
+import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.Email
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Language
@@ -30,13 +39,18 @@ import androidx.compose.material.icons.filled.Phone
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Icon
+import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -49,6 +63,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.constraintlayout.compose.ConstraintLayout
+import coil.compose.rememberAsyncImagePainter
 import com.example.foodapp.Activity.Authentication.LoginActivity
 import com.example.foodapp.Activity.BaseActivity
 import com.example.foodapp.Activity.Dashboard.MainActivity
@@ -79,6 +94,33 @@ fun PofileScreen(modifier: Modifier = Modifier, authViewModel: AuthViewModel, on
     val authState = authViewModel.authState.observeAsState()
     val context = LocalContext.current
     val user = (authState.value as? AuthState.Authenticated)?.user
+
+    var isEditing by remember { mutableStateOf(false) }
+    var name by remember { mutableStateOf(user?.name.orEmpty()) }
+    var email by remember { mutableStateOf(user?.email.orEmpty()) }
+    var phone by remember { mutableStateOf(user?.phone.orEmpty()) }
+    var address by remember { mutableStateOf(user?.address.orEmpty()) }
+    var birthDate by remember { mutableStateOf(user?.birthDate.orEmpty()) }
+
+    LaunchedEffect(user) {
+        user?.let {
+            name = it.name
+            email = it.email
+            phone = it.phone
+            address = it.address
+            birthDate = it.birthDate
+        }
+    }
+    var pickedUri by remember { mutableStateOf<Uri?>(null) }
+
+    val imagePicker = rememberLauncherForActivityResult(
+        ActivityResultContracts.GetContent()
+    ) { uri ->
+        if (uri != null && isEditing) {
+            pickedUri = uri
+
+        }
+    }
 
     LaunchedEffect(authState.value) {
         when(authState.value){
@@ -134,22 +176,42 @@ fun PofileScreen(modifier: Modifier = Modifier, authViewModel: AuthViewModel, on
             Spacer(modifier = Modifier.height(8.dp))
 
             // Avatar
-            Image(
-                painter = painterResource(R.drawable.user), // dùng ảnh mặc định
-                contentDescription = "Avatar",
-                modifier = Modifier
-                    .size(150.dp)
-                    .clip(CircleShape)
-            )
+            val painter = when {
+                pickedUri != null -> rememberAsyncImagePainter(pickedUri)
+                user?.avatarUrl.isNullOrBlank() -> painterResource(R.drawable.user)
+                else -> rememberAsyncImagePainter(user!!.avatarUrl)
+            }
+            Box {
+                Image(
+                    painter = painter,
+                    contentDescription = "Avatar",
+                    modifier = Modifier
+                        .size(100.dp)
+                        .clip(CircleShape)
+                        .clickable { if (isEditing) imagePicker.launch("image/*") }
+                )
+                if (isEditing) {
+                    Icon(
+                        imageVector = Icons.Default.Edit,
+                        contentDescription = "Edit Avatar",
+                        modifier = Modifier
+                            .align(Alignment.BottomEnd)
+                            .size(24.dp)
+                            .background(Color.White, CircleShape)
+                            .padding(4.dp)
+                    )
+                }
+            }
             Spacer(modifier = Modifier.height(14.dp))
 
             // Name
             Text(
                 text = user?.name ?: "llll",
+                color = Color.Black,
                 fontSize = 25.sp,
-                fontWeight = FontWeight.Bold,
-                color = Color(0xFF8A56AC)
-            )
+                fontWeight = FontWeight.SemiBold,
+
+                )
 
             // Title
             Text(
@@ -160,19 +222,59 @@ fun PofileScreen(modifier: Modifier = Modifier, authViewModel: AuthViewModel, on
 
             Spacer(modifier = Modifier.height(16.dp))
 
-            ProfileTextField(label = "Your Name", value = user?.name ?: "", icon = Icons.Default.AccountCircle)
-            ProfileTextField(label = "Your Email", value = user?.email ?: "", icon = Icons.Default.Email)
-            ProfileTextField(label = "Phone Number", value = user?.phone ?: "", icon = Icons.Default.Phone)
-            ProfileTextField(label = "Address", value = user?.address ?: "", icon = Icons.Default.Home)
-            ProfileTextField(label = "Birthday", value = user?.birthDate ?: "", icon = Icons.Default.DateRange)
+            ProfileTextField("Your Name", name, Icons.Default.AccountCircle, isEditing) { name = it }
+            ProfileTextField("Your Email", email, Icons.Default.Email, isEditing) { email = it }
+            ProfileTextField("Phone Number", phone, Icons.Default.Phone, isEditing) { phone = it }
+            ProfileTextField("Address", address, Icons.Default.Home, isEditing) { address = it }
+            ProfileTextField("Birthday", birthDate, Icons.Default.DateRange, isEditing) { birthDate = it }
+            ProfileTextField("Password", "********", Icons.Default.Lock, false) {}
 
-            Spacer(modifier = Modifier.height(32.dp))
+            Spacer(Modifier.height(24.dp))
 
-            Button(
-                onClick = { authViewModel.signout() },
-                colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF8A56AC))
+            // Buttons row
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.spacedBy(16.dp)
             ) {
-                Text(text = "Sign out", color = Color(0xFF03A9F4), fontWeight = FontWeight.Medium)
+                // Edit/Save button
+                Button(
+                    onClick = {
+                        if (isEditing) {
+                            val updated = user!!.copy(
+                                name = name,
+                                email = email,
+                                phone = phone,
+                                address = address,
+                                birthDate = birthDate
+                            )
+                            authViewModel.updateUserProfile(updated, pickedUri)
+                        }
+                        isEditing = !isEditing
+                    },
+                    modifier = Modifier
+                        .weight(1f)
+                        .height(48.dp),
+                    shape = RoundedCornerShape(24.dp),
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = Color(0xFF8A56AC),
+                        contentColor = Color.White
+                    )
+                ) {
+                    Text(if (isEditing) "Save" else "Edit Profile")
+                }
+
+                // Sign out button
+                OutlinedButton(
+                    onClick = { authViewModel.signout() },
+                    modifier = Modifier.weight(1f).height(48.dp),
+                    shape = RoundedCornerShape(24.dp),
+                    colors = ButtonDefaults.outlinedButtonColors(
+                        containerColor = Color(0xFF00C2FF),
+                        contentColor = Color.White
+                    )
+                ) {
+                    Text("Sign out")
+                }
             }
         }
     }
@@ -181,21 +283,25 @@ fun PofileScreen(modifier: Modifier = Modifier, authViewModel: AuthViewModel, on
 }
 
 @Composable
-fun ProfileTextField(label: String, value: String, icon: ImageVector) {
-    Column(modifier = Modifier.fillMaxWidth().padding(vertical = 8.dp)) {
-        Text(text = label, fontSize = 12.sp, color = Color.Gray)
+fun ProfileTextField(
+    label: String,
+    value: String,
+    icon: ImageVector,
+    enabled: Boolean,
+    onValueChange: (String) -> Unit
+) {
+    Column(modifier = Modifier
+        .fillMaxWidth()
+        .padding(vertical = 8.dp)
+    ) {
+        Text(label, fontSize = 12.sp, color = Color.Gray)
         OutlinedTextField(
             value = value,
-            onValueChange = {},
+            onValueChange = onValueChange,
+            enabled = enabled,
             modifier = Modifier.fillMaxWidth(),
-            enabled = false,
-            leadingIcon = { Icon(icon, contentDescription = null) },
-            colors = OutlinedTextFieldDefaults.colors(
-                disabledTextColor = Color.Black,
-                disabledBorderColor = Color.LightGray,
-                disabledLeadingIconColor = Color.Gray,
-                disabledLabelColor = Color.Gray
-            )
+            singleLine = true,
+            leadingIcon = { Icon(icon, contentDescription = null) }
         )
     }
 }
