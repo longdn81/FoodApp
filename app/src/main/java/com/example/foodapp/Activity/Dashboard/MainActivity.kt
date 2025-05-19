@@ -77,6 +77,11 @@ class MainActivity : BaseActivity() {
                     when (menu) {
                         "Cart"    -> startActivity(Intent(this, CartActivity::class.java))
                         "Profile" -> startActivity(Intent(this, ProfileActivity::class.java))
+                        "Explorer" -> startActivity(Intent(this, SearchActivity::class.java).apply {
+                            putExtra("query", "")
+                            putExtra("title", "Explorer")
+                        })
+
                     }
                 },
                 onSearch = { query ->
@@ -327,6 +332,7 @@ fun DashboardScreen(authViewModel: AuthViewModel, onNavigate: (String) -> Unit ,
                 when (menu) {
                     "Cart" -> onNavigate("Cart")
                     "Profile" -> onNavigate("Profile")
+                    "Explorer" -> onNavigate("Explorer")
 
                 }
             }

@@ -67,12 +67,13 @@ class SearchActivity : BaseActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        query = intent.getStringExtra("query") ?: ""
+        val query = intent.getStringExtra("query") ?: ""
+        val title = intent.getStringExtra("title") ?: "Search Result"
 
         searchResults = viewModel.searchItems(query)
 
         setContent {
-            SearchScreen(results = searchResults ,onBackClick = {finish()})
+            SearchScreen(results = searchResults ,onBackClick = {finish()} ,title = title)
 
         }
     }
@@ -81,7 +82,7 @@ class SearchActivity : BaseActivity() {
 
 
 @Composable
-fun SearchScreen(results: LiveData<List<ItemsModel>>, onBackClick: () -> Unit) {
+fun SearchScreen(results: LiveData<List<ItemsModel>>, onBackClick: () -> Unit, title: String) {
     val items by results.observeAsState(emptyList())
 
     Column(
@@ -98,7 +99,7 @@ fun SearchScreen(results: LiveData<List<ItemsModel>>, onBackClick: () -> Unit) {
             val (backBtn, searchTxt) = createRefs()
 
             Text(
-                text = "Search Result",
+                text = title,
                 textAlign = TextAlign.Center,
                 fontWeight = FontWeight.Bold,
                 fontSize = 25.sp,
