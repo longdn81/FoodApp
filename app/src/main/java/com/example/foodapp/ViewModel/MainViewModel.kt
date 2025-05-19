@@ -26,4 +26,8 @@ class MainViewModel():ViewModel() {
         return repository.loadFiltered(id)
     }
 
+    fun searchItems(query: String): LiveData<List<ItemsModel>> {
+        return repository.searchItems(query)
+    }
+
 }

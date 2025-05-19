@@ -15,6 +15,7 @@ import com.google.firebase.database.ValueEventListener
 class MainRepository {
     private  val firebaseDatabase = FirebaseDatabase.getInstance();
 
+
     fun loadBanner(): LiveData<MutableList<SliderModel>>{
         val listData = MutableLiveData<MutableList<SliderModel>>()
         val ref = firebaseDatabase.getReference("Banner")
@@ -104,5 +105,29 @@ class MainRepository {
 
          return listData
      }
+
+    fun searchItems(query: String): LiveData<List<ItemsModel>> {
+        val result = MutableLiveData<List<ItemsModel>>()
+
+        val ref = firebaseDatabase.getReference("Items")
+        ref.addListenerForSingleValueEvent(object : ValueEventListener {
+            override fun onDataChange(snapshot: DataSnapshot) {
+                val list = mutableListOf<ItemsModel>()
+                for (child in snapshot.children) {
+                    val item = child.getValue(ItemsModel::class.java)
+                    if (item != null && item.title.contains(query, ignoreCase = true)) {
+                        list.add(item)
+                    }
+                }
+                result.value = list
+            }
+
+            override fun onCancelled(error: DatabaseError) {
+                result.value = emptyList()
+            }
+        })
+
+        return result
+    }
 
 }
